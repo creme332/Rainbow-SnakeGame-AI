@@ -3,22 +3,38 @@ Snake::Snake(COORD p, int v) {
 	this->pos = p;
 	this->vel = v;
 	len = 1;
+	Body.push_back(p);
 }
 
-void Snake::move_snake(char direction) {
+bool Snake::move_snake(char direction, int width, int height) { //returns 1 if there was a collision
+	int x=pos.X, y=pos.Y; //new position of snake
 	switch (direction) {
-	case 'w': pos.Y-=vel;break;
-	case 's': pos.Y+=vel;break;
-	case 'a': pos.X-=vel;break;
-	case 'd': pos.X+=vel;break;
+	case 'w': y = pos.Y - vel;break;
+	case 's': y = pos.Y + vel;break;
+	case 'a': x = pos.X - vel;break;
+	case 'd': x = pos.X + vel;break;
 	}
-}
-bool Snake::HasCollided(int width, int height) {
-	if (pos.Y == height - 1 || pos.X == width - 1||pos.X==0|| pos.Y==0) {
+	//to show invalid move
+	pos.Y = y;
+	pos.X = x;
+	//validate x, y
+	if (y == height - 1 || x == width - 1 || x == 0 ||y == 0) {//went into grid
 		return 1;
+	}
+
+	//to deal with 2-unit snake self-collision
+	for (int i = 0;i < Body.size() - 1;i++) { //Body[lastindex] is previous pos of head. f
+		if (Body[i].Y == y && Body[i].X == x) {return 1;}
+	}
+
+	//update head and tail of snake
+	Body.push_back(pos);
+	if (Body.size() > len) { //if body has grown in size
+		Body.erase(Body.begin());
 	}
 	return 0;
 }
+vector <COORD> Snake::get_body() { return Body; }
 void Snake::grow(){
 	len++;
 }
