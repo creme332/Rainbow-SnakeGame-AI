@@ -1,4 +1,4 @@
-#include <iostream>
+﻿#include <iostream>
 #include <cstring>
 #include <conio.h> 
 #include "Snake.h"
@@ -10,7 +10,7 @@
 
 #include <cstdlib>
 
-#define HEIGHT 30
+#define HEIGHT 20
 #define WIDTH 40
 #define VERTICAL_WALL '|'
 #define HORIZONTAL_WALL '#'
@@ -125,8 +125,9 @@ void UpdateBoard() { //create a board class later. FIRST LOOP CAN BE REMOVED.
 }
 int main()
 {
+    std::cout << " " << "\033[48;5;34m\033[38;5;232m \033";
     srand(time(NULL));
-    //PROBLEM : snake speeding up vertically (Illusion due to vertical gap between lines)
+   
     int score = 0;
     InitialiseTerminal();
     char Direction = 'd';
@@ -138,7 +139,12 @@ int main()
     while (!HasCollided) {
         setCursorPosition(0, WIDTH + 13);
         cout << score;
-        std::this_thread::sleep_for(std::chrono::milliseconds(50)); //lower to increase speed of snake
+        if (Direction == 'w' || Direction == 's') {
+            std::this_thread::sleep_for(std::chrono::milliseconds(115));  //Fixes : snake speeding up vertically (Illusion due to vertical gap between lines)
+        }
+        else {
+            std::this_thread::sleep_for(std::chrono::milliseconds(75));
+        }
         if (_kbhit()) { 
             Direction = _getch();
         }
