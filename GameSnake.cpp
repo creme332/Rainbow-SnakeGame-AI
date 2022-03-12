@@ -10,7 +10,7 @@
 
 #include <cstdlib>
 
-#define HEIGHT 60
+#define HEIGHT 30
 #define WIDTH 40
 #define VERTICAL_WALL '|'
 #define HORIZONTAL_WALL '#'
