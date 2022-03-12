@@ -11,7 +11,7 @@ private :
 public:
 	Snake(COORD pos, int vel);
 	void move_snake(char direction);
-	bool CollisionDetected();
+	bool HasCollided(int width, int height);
 	void grow();
 	bool eaten(COORD foodpos);
 	COORD get_pos();

@@ -5,10 +5,12 @@
 #define NOMINMAX
 #define WIN32_LEAN_AND_MEAN
 #include <Windows.h>
+#include <thread>
+
 #include <cstdlib>
 
-#define HEIGHT 50
-#define WIDTH 100
+#define HEIGHT 20
+#define WIDTH 40
 #define VERTICAL_WALL '|'
 #define HORIZONTAL_WALL '#'
 #define EMPTY ' '
@@ -17,7 +19,7 @@
 using namespace std;
 
 char prevBoard[HEIGHT][WIDTH]; //board currently displayed on terminal
-Snake mySnake({ WIDTH / 2,HEIGHT / 2 }, 1); 
+Snake mySnake({ WIDTH / 2, HEIGHT / 2 }, 1); 
 COORD FoodPos;
 
 void GenerateFood() { //add seed
@@ -106,22 +108,23 @@ void UpdateBoard() { //create a board class later
 }
 int main()
 {
+    //PROBLEM : snake speeding up vertically
     InitialiseTerminal();
-    while (true) {
+    char prevDirection = 'd';
+    while (!mySnake.HasCollided(WIDTH,HEIGHT)) {
         hidecursor();
-        if (_kbhit()) {mySnake.move_snake(_getch());}
+        std::this_thread::sleep_for(std::chrono::milliseconds(50)); //lower to increase speed of snake
+        if (_kbhit()) { prevDirection = _getch();}
+        mySnake.move_snake(prevDirection);
         UpdateBoard();
+
         if (mySnake.eaten(FoodPos)) {
             GenerateFood();
-            if (FoodPos.X <1 || FoodPos.X>WIDTH - 2 || FoodPos.Y < 1 || FoodPos.Y> HEIGHT - 2 ) {
-                cout << FoodPos.X<<"\n";
-                cout << FoodPos.Y<<"\n";
-
-                system("pause");
-            }
             mySnake.grow();
         }
     }
+    //relocate cursor
+    cout << "Game over\n";
     system("pause");
 
 }

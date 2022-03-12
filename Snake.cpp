@@ -13,8 +13,11 @@ void Snake::move_snake(char direction) {
 	case 'd': pos.X+=vel;break;
 	}
 }
-bool Snake::CollisionDetected() {
-	return 1;
+bool Snake::HasCollided(int width, int height) {
+	if (pos.Y == height - 1 || pos.X == width - 1||pos.X==0|| pos.Y==0) {
+		return 1;
+	}
+	return 0;
 }
 void Snake::grow(){
 	len++;
