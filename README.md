@@ -19,5 +19,28 @@ Recommended : maximise size of terminal
 # Limitations # 
 - Snake appears thinner when moving vertically. This is because in the terminal there is small separation between 2 horizontal lines right on top on each other. Unfortunately, nothing can be done to get rid of this line height. 
 - For the same reason as above, there is an illusion that the snake moves faster vertically. However, this speed difference was "fixed" by making snake more slower vertically using the sleep function. 
+- If you want to resize the terminal during gameplay, the grid boundaries and the food will disappear.
+To fix this :
 
-
+Change 
+  ```cpp
+      for (int row = 0;row < HEIGHT;row++) {
+        for (int col = 0;col < WIDTH;col++) {
+            if (newBoard[row][col] != TerminalGrid[row][col]) { 
+                setCursorPosition(row, col);
+                std::cout << Color(newBoard[row][col]);
+            }
+        }
+      }
+  ```
+  to
+  ```cpp
+      for (int row = 0;row < HEIGHT;row++) {
+        for (int col = 0;col < WIDTH;col++) {
+            if (newBoard[row][col] != TerminalGrid[row][col] || newBoard[row][col] == VERTICAL_WALL || newBoard[row][col] == HORIZONTAL_WALL || newBoard[row][col] == FOOD) { //for when terminal is resized
+                setCursorPosition(row, col);
+                std::cout << Color(newBoard[row][col]);
+            }
+        }
+      }
+  ```
