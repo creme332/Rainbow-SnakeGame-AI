@@ -8,4 +8,5 @@
 
 # How to play #
 Use W-A-S-D keys to move snake while avoiding walls and collecting food. (Caps lock should be OFF) 
+Recommended : maximise size of terminal
 
