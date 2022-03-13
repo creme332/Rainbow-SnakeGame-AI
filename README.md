@@ -2,13 +2,14 @@
 
 ![](Media/ezgif.com-gif-maker.gif)
 
-This LGBT (Lavender-Green-Blue-Teal) snake changes color repeatedly.
+The LGBT (Lavender-Green-Blue-Teal) snake changes color repeatedly.
 # Features #
 1. Smooth gameplay (No flickering of screen/cursor which is common when refreshing terminal without a graphics library).
 2. Colored terminal.
 - [ ] Food must be generated at free spot
 - [ ] End game when size of snake ==  total cells in grid
 - [ ] Output score at the end in the center of grid
+- [ ] Vary difficulty
 - [ ] Add AI snake (A* path finding algorithm)
 
 # How to play #
