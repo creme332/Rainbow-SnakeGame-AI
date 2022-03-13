@@ -11,6 +11,7 @@ The LGBT (Lavender-Green-Blue-Teal) snake changes color repeatedly.
 - [ ] Output score at the end in the center of grid
 - [ ] Vary difficulty
 - [ ] Add AI snake (A* path finding algorithm)
+- [ ] Rename GIF
 
 # How to play #
 Use W-A-S-D keys to move snake while avoiding walls and collecting food. (Caps lock should be OFF) 
