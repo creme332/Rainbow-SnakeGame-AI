@@ -1,11 +1,11 @@
-# GameSnake
+# Rainbow Snake
 
 ![](Media/ezgif.com-gif-maker.gif)
 
-A better C++ terminal snake game
+# Features #
+1. Screen/cursor does not flicker when refreshing terminal.
+2. Colored terminal without any graphics library.
 
-- [ ] Combine the two loops in DisplayBoard
-- [ ] Add colours to output
-# Improvements over other terminal snake games #
-1. Screen/cursor does not flicker when refreshing terminal
-2. Colored terminal
+# How to play #
+Use W-A-S-D keys to move snake while avoiding walls and collecting food. (Caps lock should be OFF) 
+
