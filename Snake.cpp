@@ -36,7 +36,7 @@ bool Snake::move_snake(char direction, int width, int height) { //returns 1 if t
 }
 vector <COORD> Snake::get_body() { return Body; }
 void Snake::grow(){
-	len++;
+	len+=5;
 }
 bool Snake ::eaten(COORD foodpos) {
 	if (pos.Y == foodpos.Y && pos.X == foodpos.X)return 1;

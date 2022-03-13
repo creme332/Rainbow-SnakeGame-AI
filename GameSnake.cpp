@@ -1,6 +1,7 @@
 ﻿#include <iostream>
 #include <cstring>
 #include <conio.h> 
+#include <string>
 #include "Snake.h"
 #define NOMINMAX
 #define WIN32_LEAN_AND_MEAN
@@ -10,8 +11,8 @@
 
 #include <cstdlib>
 
-#define HEIGHT 20
-#define WIDTH 40
+#define HEIGHT 50
+#define WIDTH 100
 #define VERTICAL_WALL '|'
 #define HORIZONTAL_WALL '#'
 #define EMPTY ' '
@@ -24,18 +25,25 @@ using namespace std;
 char TerminalGrid[HEIGHT][WIDTH]; //board currently displayed on terminal
 COORD grid = { WIDTH / 2, HEIGHT / 2 };
 Snake mySnake(grid, 1); 
-COORD FoodPos;
-
+COORD FoodPos; //position of food on board
+string Color(char c) {
+   int color[] = { 200,208,112,219,39,51,33, 20,43, 135};
+    if(c==SNAKEHEAD) return  "\033[48;5;34m\033[38;5;232m \033[0m"; //green block for head
+    if (c == SNAKEBODY) {
+        int k = rand() % (sizeof(color) / sizeof(color[0]));
+        return  "\033[48;5;" + to_string(color[k])+ "m\033[38;5;232m \033[0m"; 
+    } 
+    if (c == FOOD) return  "\033[48;5;196m\033[38;5;232m \033[0m"; //red block for food
+    string output = ""; output += c;
+    return output;
+}
 void GenerateFood() { //add seed
     // x [1, width - 2] and y [1, height - 2]
     FoodPos.X = (rand() % (WIDTH - 2)) + 1;
     FoodPos.Y = (rand() % (HEIGHT - 2)) + 1;
 }
-void setConsoleColour(unsigned short colour){
-    static const HANDLE hOut = GetStdHandle(STD_OUTPUT_HANDLE);
-    std::cout.flush();
-    SetConsoleTextAttribute(hOut, colour);
-}
+
+
 void hidecursor()
 {
     HANDLE consoleHandle = GetStdHandle(STD_OUTPUT_HANDLE);
@@ -56,12 +64,12 @@ void InitialiseTerminal() {
     GenerateFood();
     COORD pos = mySnake.get_pos(); //rename to SnakeHeadPosition
     //first initialise TerminalGrid 
-    for (int row = 0;row < HEIGHT;row++) {
+    for (int row = 0;row < HEIGHT;row++) { //ADD snake head here!!!!
         TerminalGrid[row][0] = VERTICAL_WALL;
         for (int col = 1;col < WIDTH - 1;col++) {
             if (row == 0 || row == HEIGHT - 1)TerminalGrid[row][col] = HORIZONTAL_WALL;
             else {
-                if (row == pos.Y && col == pos.X) { TerminalGrid[row][col] = SNAKEBODY; }
+                if (row == pos.Y && col == pos.X) { TerminalGrid[row][col] = SNAKEHEAD; }
                 else {
                     if (row == FoodPos.Y && col == FoodPos.X) {TerminalGrid[row][col] = FOOD; }
                     else { TerminalGrid[row][col] = EMPTY; }
@@ -74,7 +82,7 @@ void InitialiseTerminal() {
     //output to terminal
     for (int row = 0;row < HEIGHT;row++) {
         for (int col = 0;col < WIDTH;col++) {
-            cout << TerminalGrid[row][col];
+             cout << Color(TerminalGrid[row][col]);
         }
         cout << endl;
     }
@@ -116,27 +124,26 @@ void UpdateBoard() { //create a board class later. FIRST LOOP CAN BE REMOVED.
         for (int col = 1;col < WIDTH-1;col++) {
             if (newBoard[row][col] != TerminalGrid[row][col]) {
                 setCursorPosition(row, col);
-                std::cout << newBoard[row][col];
+                std::cout << Color(newBoard[row][col]);
             }
         }
     }
     std::cout.flush();
     std::memcpy((char*)TerminalGrid, (char const*)newBoard, HEIGHT * WIDTH);
 }
-int main()
-{
-    std::cout << " " << "\033[48;5;34m\033[38;5;232m \033";
+int main(){
     srand(time(NULL));
    
     int score = 0;
     InitialiseTerminal();
     char Direction = 'd';
     bool HasCollided = 0;
-    hidecursor();
 
     setCursorPosition(0, WIDTH + 5);
     cout << "SCORE : ";
-    while (!HasCollided) {
+
+    while (!HasCollided) { //end game when snake len =  board cells
+        hidecursor();
         setCursorPosition(0, WIDTH + 13);
         cout << score;
         if (Direction == 'w' || Direction == 's') {
@@ -154,15 +161,13 @@ int main()
             GenerateFood();
             score += 10;
             mySnake.grow();
-        }
- 
-
- 
+        } 
     }
-    //relocate cursor
     setCursorPosition(1, WIDTH + 5);
     cout << "GAME OVER   ";
     setCursorPosition(HEIGHT+10,0);
     system("pause");
+    system("pause");
+    return 0;
 
 }
