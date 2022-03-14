@@ -13,6 +13,7 @@ The LGBT (Lavender-Green-Blue-Teal) snake changes color repeatedly.
 - [ ] Vary difficulty
 - [ ] Add a few seconds at end of gif so that there's time to see game over.
 - [ ] Rename GIF
+- [ ] Multiple snake themes
 
 # How to play #
 Use W-A-S-D keys to move snake while avoiding walls and collecting food. (Caps lock should be OFF) 
