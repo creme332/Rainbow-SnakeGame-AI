@@ -47,3 +47,8 @@ Change
         }
       }
   ```
+# Possible bug #
+If your terminal looks like this :
+![image](https://user-images.githubusercontent.com/65414576/158123347-459a8566-7446-4250-8274-9ed5dfb9a213.png)
+
+Close all previous terminals before starting a new one.
