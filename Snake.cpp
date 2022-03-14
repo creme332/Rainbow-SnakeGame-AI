@@ -7,7 +7,7 @@ Snake::Snake(COORD p, int v) {
 }
 
 bool Snake::move_snake(char direction, int width, int height) { //returns 1 if there was a collision
-	if (len == (width-1) * (height-1))return 1; //game over if snake occupies entire board
+	if (len >= (width-1) * (height-1))return 1; //game over if snake occupies entire board
 	int x=pos.X, y=pos.Y; //new position of snake
 	switch (direction) {
 	case 'w': y = pos.Y - vel;break;
