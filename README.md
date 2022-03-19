@@ -22,6 +22,6 @@ If game is over, close all previous terminals before starting a new one.
 - [ ] Improve AI algorithm (use an approximation of the longest path from snake head to food)
 
 # Resources used to build the game #
-https://youtu.be/AxrQje7V65o 
+Getting started : https://youtu.be/AxrQje7V65o 
 
-https://cs.stanford.edu/people/abisee/gs.pdf
+BFS algorithm : https://cs.stanford.edu/people/abisee/gs.pdf
