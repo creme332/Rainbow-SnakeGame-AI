@@ -13,20 +13,27 @@
 #define NOMINMAX
 #define WIN32_LEAN_AND_MEAN
 #define HEIGHT 25
-#define WIDTH 40
+#define WIDTH 50
 #define VERTICAL_WALL '|'
 #define HORIZONTAL_WALL '#'
 #define EMPTY ' '
 #define FOOD '*'
 #define SNAKEHEAD '@'
 #define SNAKEBODY 'o'  
+#define LEFT 'a'
+#define RIGHT 'd'
+#define UP 'w'
+#define DOWN 's'
 using namespace std;
 
 char TerminalGrid[HEIGHT][WIDTH]; //board currently displayed on terminal
-COORD grid = { WIDTH / 2, HEIGHT / 2 };
-Snake mySnake(grid, 1);
-COORD FoodPos; //position of food on board
+COORD MiddleGrid = { HEIGHT / 2, WIDTH / 2 };
+COORD FoodPos; //position of food on board. FoodPos.X : row number. FoodPos.Y=col number
+
+Snake mySnake(MiddleGrid, WIDTH, HEIGHT);
 int k = -1; //color counter
+
+
 string Color(char c) { // color a character
     int color[] = { 196,220,226,10,39,129 }; //list of colors
     if (c == SNAKEHEAD) return  "\033[48;5;196m\033[38;5;232m \033[0m"; //green block for head
@@ -39,25 +46,6 @@ string Color(char c) { // color a character
     if (c == FOOD) return  "\033[48;5;14m\033[38;5;232m \033[0m"; //red block for food
     string output = ""; output += c;
     return output;
-}
-bool NotSnakeBody(int row, int col) {
-    // Is cell at (row, col) not a snake body part ?
-    vector <COORD> snakebody = mySnake.get_body();
-    for (int i = 0;i < snakebody.size();i++) {
-        if (snakebody[i].X == col && snakebody[i].Y == row)return 0;
-    }
-    return 1;
-}
-void GenerateFood() {
-    // col in [1, width - 2] and row in [1, height - 2]
-    FoodPos.X = (rand() % (WIDTH - 2)) + 1;
-    FoodPos.Y = (rand() % (HEIGHT - 2)) + 1;
-
-    while (!NotSnakeBody(FoodPos.Y, FoodPos.X)) { //spawn food in a position not occupied by snake
-        FoodPos.X = (rand() % (WIDTH - 2)) + 1;
-        FoodPos.Y = (rand() % (HEIGHT - 2)) + 1;
-    }
-
 }
 void hidecursor()
 {
@@ -74,6 +62,19 @@ void setCursorPosition(const int row, const int col)
     COORD coord = { (SHORT)col, (SHORT)row };
     SetConsoleCursorPosition(hOut, coord);
 }
+
+void GenerateFood() {
+    // col in [1, width - 2] and row in [1, height - 2]
+    FoodPos.Y = (rand() % (WIDTH - 2)) + 1; //col
+    FoodPos.X = (rand() % (HEIGHT - 2)) + 1; //row
+
+    while (!mySnake.NotSnakeBody(FoodPos.Y, FoodPos.X)) { //spawn food in a position not occupied by snake
+        FoodPos.Y = (rand() % (WIDTH - 2)) + 1;
+        FoodPos.X = (rand() % (HEIGHT - 2)) + 1;
+    }
+
+}
+
 void InitialiseTerminal() {
 
     GenerateFood();
@@ -84,9 +85,9 @@ void InitialiseTerminal() {
         for (int col = 1;col < WIDTH - 1;col++) {
             if (row == 0 || row == HEIGHT - 1)TerminalGrid[row][col] = HORIZONTAL_WALL;
             else {
-                if (row == SnakeHeadPosition.Y && col == SnakeHeadPosition.X) { TerminalGrid[row][col] = SNAKEHEAD; }
+                if (row == SnakeHeadPosition.X && col == SnakeHeadPosition.Y) { TerminalGrid[row][col] = SNAKEHEAD; }
                 else {
-                    if (row == FoodPos.Y && col == FoodPos.X) { TerminalGrid[row][col] = FOOD; }
+                    if (row == FoodPos.X && col == FoodPos.Y) { TerminalGrid[row][col] = FOOD; }
                     else { TerminalGrid[row][col] = EMPTY; }
                 }
             }
@@ -102,11 +103,11 @@ void InitialiseTerminal() {
         cout << "\n";
     }
 }
+
 void UpdateBoard() {
     COORD SnakeHeadPosition = mySnake.get_pos();
     vector <COORD> snakebody = mySnake.get_body();
     setCursorPosition(HEIGHT, 0);
-    COORD currentpos;
     //create a new board
     char newBoard[HEIGHT][WIDTH];
 
@@ -115,13 +116,13 @@ void UpdateBoard() {
         for (int col = 1;col < WIDTH - 1;col++) {
             if (row == 0 || row == HEIGHT - 1)newBoard[row][col] = HORIZONTAL_WALL;
             else {
-                if (SnakeHeadPosition.Y == row && SnakeHeadPosition.X == col) { newBoard[row][col] = SNAKEHEAD; }
+                if (SnakeHeadPosition.X == row && SnakeHeadPosition.Y == col) { newBoard[row][col] = SNAKEHEAD; }
                 else {
-                    if (row == FoodPos.Y && col == FoodPos.X) { newBoard[row][col] = FOOD; }
+                    if (row == FoodPos.X && col == FoodPos.Y) { newBoard[row][col] = FOOD; }
                     else {
                         bool body = 0;
                         for (auto i : snakebody) {
-                            if (i.Y == row && i.X == col) body = 1; newBoard[row][col] = SNAKEBODY;
+                            if (i.X == row && i.Y == col) body = 1; newBoard[row][col] = SNAKEBODY;
                         }
                         if (!body) {
                             newBoard[row][col] = EMPTY; //if cell is not wall, food nor snake, it is empty
@@ -148,106 +149,171 @@ void UpdateBoard() {
     std::cout.flush();
     std::memcpy((char*)TerminalGrid, (char const*)newBoard, HEIGHT * WIDTH);
 }
-char AI() { //bfs
-    COORD SnakeHeadPosition = mySnake.get_pos();
-    int startcol = SnakeHeadPosition.X;
-    int startrow = SnakeHeadPosition.Y;
-    int finishcol = FoodPos.X;
-    int finishrow = FoodPos.Y;
-    //if (startrow == finishrow && startcol == finishcol) return 0;
-    map <pair<int, int>, int> distance = { {{startrow, startcol},0} }; //minimum distance from start to stored node(in terms of number of moves required)
-    deque <pair<int, int>> NextNode = { {startrow, startcol} }; //head of queue is the next node to be checked
-    map <pair<int, int>, pair<int, int>> parentnode = { {{startrow, startcol}, {-1,-1}} }; // {node, parent node}
-    deque <pair<int, int>> shortestpath; //stores nodes along shortest path in (row,col) format
 
-    vector <int> dx = { 1,0,-1,0 }; // translation horizontally
-    vector <int> dy = { 0,1,0,-1 }; //translation vertically
+std::stack <std::pair<int, int>> maxPath() {// using brute force
+    int startcol = mySnake.get_pos().Y;
+    int startrow = mySnake.get_pos().X;
+    int finishcol = FoodPos.Y;
+    int finishrow = FoodPos.X;
+
+    std::map < std::pair<int, int>, int > distance = { {{startrow, startcol},0} }; //distance from start to stored node(in terms of number of moves required)
+    std::stack <std::pair<int, int>> NextNode; //next node to be checked
+    std::stack <std::pair<int, int>> longestpath; //stores nodes along longest path in (row,col) format
+    std::map <std::pair<int, int>, std::pair<int, int>> parentnode = { {{startrow, startcol}, {-1,-1}} }; // {node, parent node}
+
+    std::vector <int> dx = { 1,0,-1,0 }; // translation horizontally
+    std::vector <int> dy = { 0,1,0,-1 }; //translation vertically
     int x, y; // new coordinates (row,col) after moving 
+    int currentdistance;
+    int maxdistance = -1;
+
+    NextNode.push({ startrow, startcol });
 
     while (NextNode.size() != 0) {
-        pair<int, int> currentcoord = NextNode.front();
-        NextNode.pop_front();
+        std::pair<int, int> currentcoord = NextNode.top();
+        setCursorPosition(currentcoord.first, currentcoord.second);
+        cout << Color(SNAKEBODY);
+        std::this_thread::sleep_for(std::chrono::milliseconds(50));
 
-        for (int i = 0; i < 4;i++) {
-            x = currentcoord.first + dx[i]; //row 
-            y = currentcoord.second + dy[i]; //col
+        currentdistance = distance[currentcoord];
+        NextNode.pop();
 
-            if (x > 0 && x < HEIGHT - 1 && y > 0
-                && y < WIDTH - 1 && parentnode.count({ x,y }) == 0
-                && NotSnakeBody(x, y))
-            {
-                NextNode.push_back({ x,y });
-                parentnode[{x, y}] = { currentcoord.first, currentcoord.second };
-                distance[{x, y}] = distance[currentcoord] + 1;
+        if (currentcoord.first == finishrow && currentcoord.second == finishcol) { //destination reached
+            if (currentdistance > maxdistance) { //new longest path discovered
+                maxdistance = currentdistance;
+                longestpath.empty();
+                int x0, y0;
+                x = currentcoord.first;
+                y = currentcoord.second;
+                while (x != -1) { // while start node not reached, 
+                    longestpath.push({ x, y });
+                    x0 = x; y0 = y;
+                    x = parentnode[{x0, y0}].first;
+                    y = parentnode[{x0, y0}].second;
+                }
+            }
+        }
+        else {
+            for (int i = 0; i < 4;i++) {
+                x = currentcoord.first + dx[i]; //row 
+                y = currentcoord.second + dy[i]; //col
 
-                if (x == finishrow && y == finishcol) {//shortest path known
-                    int x0, y0;
-                    while (x != -1) { // while start node not reached
-                        shortestpath.push_front({ x, y });
-                        x0 = x; y0 = y;
-                        x = parentnode[{x0, y0}].first;
-                        y = parentnode[{x0, y0}].second;
-                    }
-                    //0 th node of shortestpath is startnode and 1st node is our next node to be visited
-                    int nextrow = shortestpath[1].first, nextcol = shortestpath[1].second;
-                    if (nextrow == startrow) {
-                        if (nextcol - startcol == 1) { return 'd'; } //move right
-                        return 'a'; //move left
-                    }
-                    if (nextcol == startcol) {
-                        if (nextrow - startrow == 1) { return 's'; }//move down
-                        return 'w';//move up
+                if (x > 0 && x < HEIGHT - 1 && y > 0
+                    && y < WIDTH - 1 && parentnode.count({ x,y }) == 0 //unvisited
+                    && mySnake.NotSnakeBody(x, y)) {
+                    NextNode.push({ x,y });
+                    if (currentdistance + 1 > distance[{x, y}]) {
+                        distance[{x, y}] = currentdistance + 1;
+                        parentnode[{x, y}] = { currentcoord.first, currentcoord.second };
                     }
                 }
 
             }
+        }
 
-        }
     }
-    //if no path to food is currently available, move to a free position
-    for (int i = 0;i < 4;i++) {
-        x = startrow + dx[i]; // new row 
-        y = startcol + dy[i]; // new col
-        if (x > 0 && x < HEIGHT - 1 && y > 0 //validation
-            && y < WIDTH - 1 && NotSnakeBody(x, y)) {
-            //free position found
-            if (x == startrow) {
-                if (y - startcol == 1) { return 'd'; } //move right
-                return 'a'; //move left
-            }
-            if (y == startcol) {
-                if (x - startrow == 1) { return 's'; }//move down
-                return 'w';//move up
-            }
-        }
-    }
-    return 'd';
+    //if path does not exist to food ?????
+    return longestpath;
+
 }
+
+std::stack <std::pair<int, int>> longestpath; //stores nodes along longest path in (row,col) format
+
+void rec(int startrow, int startcol, int finishrow, int finishcol, int currentdistance) {
+    static std::map < std::pair<int, int>, bool > AlreadyVisited = { {{startrow, startcol},1} };
+    static std::map <std::pair<int, int>, std::pair<int, int>> parentnode = { {{startrow, startcol}, {-1,-1}} }; // {node, parent node}
+    static int maxdistance = -1;
+    std::vector <int> dx = { 1,0,-1,0 }; // translation horizontally
+    std::vector <int> dy = { 0,1,0,-1 }; //translation vertically
+    int x, y;
+
+    if (startrow == finishrow && startcol == finishcol) {
+        if (currentdistance > maxdistance) {
+            maxdistance = currentdistance;
+            longestpath.empty();
+            int x0, y0;
+            x = startrow;
+            y = startcol;
+            while (x != -1) { // while start node not reached, 
+                longestpath.push({ x, y });
+                x0 = x; y0 = y;
+                x = parentnode[{x0, y0}].first;
+                y = parentnode[{x0, y0}].second;
+            }
+        }
+        return;
+    }
+
+    for (int i = 0; i < 4;i++) {
+        x = startrow + dx[i]; //row 
+        y = startcol + dy[i]; //col
+
+        if (x > 0 && x < HEIGHT - 1 && y > 0 && y < WIDTH - 1 && AlreadyVisited[{x,y}] == 0) {
+            AlreadyVisited[{x, y}] = 1;
+            parentnode[{x, y}] = { startrow, startcol };
+            rec(x, y, finishrow, finishcol, currentdistance + 1);
+            AlreadyVisited[{x, y}] = 0;
+        }
+    }
+}
+char AI() { //bfs
+    //add to snake class
+    COORD SnakeHeadPosition = mySnake.get_pos();
+    int startcol = SnakeHeadPosition.Y;
+    int startrow = SnakeHeadPosition.X;
+    int finishcol = FoodPos.Y;
+    int finishrow = FoodPos.X;
+    std::vector <int> dx = { 1,0,-1,0 }; // translation horizontally
+    std::vector <int> dy = { 0,1,0,-1 }; //translation vertically
+
+    char D1 = mySnake.minPath(FoodPos);
+    int x, y;
+    if (D1 == ERROR) { //if no path exist, move to a any free position
+        for (int i = 0;i < 4;i++) {
+            x = startrow + dx[i]; // new row 
+            y = startcol + dy[i]; // new col
+            if (x > 0 && x < HEIGHT - 1 && y > 0 //validation
+                && y < WIDTH - 1 && mySnake.NotSnakeBody(x, y)) {
+                //free position found
+                if (x == startrow) {
+                    if (y - startcol == 1) { return RIGHT; } //move right
+                    return LEFT; //move left
+                }
+                if (y == startcol) {
+                    if (x - startrow == 1) { return DOWN; }//move down
+                    return UP;//move up
+                }
+            }
+        }
+        return RIGHT;
+    }
+    return D1;
+}
+
 int main() {
     
     srand(time(NULL)); //seed for random function
     int score = 0;
-    char Direction = 'd'; //initially move right
+    char Direction = RIGHT; //initially move right
     bool HasCollided = 0; //has Snake collided with wall or itself?
-    bool AIsnake = 1; // AI mode
+    bool AIMode = 1; // AI mode
 
     InitialiseTerminal();
     hidecursor();
 
     while (!HasCollided) { //end game when snake len =  board cells
         hidecursor();
-        if (Direction == 'w' || Direction == 's') {
-            std::this_thread::sleep_for(std::chrono::milliseconds(115));  //Fixes : snake speeding up vertically (Illusion due to vertical gap between lines)
+        if (Direction == UP || Direction == DOWN) {
+            std::this_thread::sleep_for(std::chrono::milliseconds(50));  //Fixes : snake speeding up vertically (Illusion due to vertical gap between lines)
         }
-        else {
-            std::this_thread::sleep_for(std::chrono::milliseconds(75));
-        }
+        else {std::this_thread::sleep_for(std::chrono::milliseconds(10));}
+
         //move 
-        if (AIsnake) { Direction = AI(); }
+        if (AIMode) { Direction = mySnake.AI(FoodPos); }
         else {
-            if (_kbhit()) { Direction = _getch(); }
+            if (_kbhit()) { Direction = _getch(); HasCollided = mySnake.move_snake(Direction);UpdateBoard(); }
         }
-        HasCollided = mySnake.move_snake(Direction, WIDTH, HEIGHT);
+        HasCollided = mySnake.move_snake(Direction);
         UpdateBoard();
         if (mySnake.eaten(FoodPos)) {
             GenerateFood();

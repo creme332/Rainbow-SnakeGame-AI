@@ -1,20 +1,33 @@
 #pragma once
 #include <Windows.h>
 #include <vector>
-using namespace std;
+#include <map>
+#include <deque>
+#include <stack>
+#define LEFT 'a'
+#define RIGHT 'd'
+#define UP 'w'
+#define DOWN 's'
+#define ERROR 'x'
 class Snake
 {
 private :
-	COORD pos; //x- col ans y-row
-	int len; //initial length of snake?
-	int vel; //problem with vel. will skip food in between
-	vector <COORD> Body;
+	COORD SnakeHeadPosition; //x : row ; y : col
+	int SnakeLength; //initial length of snake?
+	std::vector <COORD> Body;  //Body.X : row number and Body.Y : col number. Last position in Body is the head
+	int GridWidth; //number of columns in grid
+	int GridHeight; //number of rows in grid.
 public:
-	Snake(COORD pos, int vel);
-	bool move_snake(char direction, int width, int height);
+	Snake(COORD headpos, int width, int height);
+	bool move_snake(char direction);
 	void grow();
 	bool eaten(COORD foodpos);
 	COORD get_pos();
-	vector <COORD> get_body();
+	std::vector <COORD> get_body();
+	char minPath(COORD destination); //returns next direction that will lead to minimum path to food. Uses BFS.
+	std::stack <std::pair<int, int>> maxPath(COORD FoodPos); //returns next direction that will lead to longest path to food.
+	char AI(COORD FoodPos);
+	bool NotSnakeBody(int row, int col); //is board[row][col] a snake body part?
+	bool LastTailPart(int row, int col); //is cell at (row, col) a snake tail?
 };
 
