@@ -23,3 +23,5 @@ If game is over, close all previous terminals before starting a new one.
 
 # Resources used to build the game #
 https://youtu.be/AxrQje7V65o 
+
+https://cs.stanford.edu/people/abisee/gs.pdf
