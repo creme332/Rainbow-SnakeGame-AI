@@ -1,10 +1,11 @@
-# LGBT Snake
+# Basic snake game
 
-![](Media/ezgif.com-gif-maker.gif)
+![](Media/UpdatedSnakeGif.gif)
 
 # Features #
 1. Smooth gameplay (No flickering of screen/cursor which is a common problem when refreshing the terminal without a graphics library).
 2. Colored terminal.
+3. AI mode (work in progress)
 
 # How to play #
 Use W-A-S-D keys to move snake while avoiding walls and collecting food. (Caps lock of keyboard should be OFF)
@@ -20,8 +21,6 @@ If game is over, close all previous terminals before starting a new one.
 - [x] End game when size of snake ==  total cells in grid
 - [x] Output score at the end in the center of grid
 - [ ] Improve AI algorithm (use an approximation of the longest path from snake head to food)
-- [ ] Add a few seconds at end of gif so that there's time to see game over.
-- [ ] Rename GIF
 
 # Resources used to build the game #
 https://youtu.be/AxrQje7V65o 
