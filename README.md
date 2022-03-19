@@ -1,5 +1,3 @@
-# Basic snake game
-
 ![](Media/UpdatedSnakeGif.gif)
 
 # Features #
