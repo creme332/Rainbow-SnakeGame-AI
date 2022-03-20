@@ -25,9 +25,8 @@ public:
 	COORD get_pos();
 	std::vector <COORD> get_body();
 	char minPath(COORD destination); //returns next direction that will lead to minimum path to food. Uses BFS.
-	std::stack <std::pair<int, int>> maxPath(COORD FoodPos); //returns next direction that will lead to longest path to food.
-	char AI(COORD FoodPos);
+	char AI_BFS(COORD FoodPos);
 	bool NotSnakeBody(int row, int col); //is board[row][col] a snake body part?
-	bool LastTailPart(int row, int col); //is cell at (row, col) a snake tail?
+	char AI_Hamilton();
 };
 

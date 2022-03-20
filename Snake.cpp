@@ -8,30 +8,27 @@ Snake::Snake(COORD headpos, int width, int height) {
 }
 
 bool Snake::move_snake(char direction) { //returns 1 if there was a collision
+
+    if (direction == ERROR) return 1; //invalid direction
 	if (SnakeLength >= (GridWidth -1) * (GridHeight -1))return 1; //game over if snake occupies entire board
 
-	int row = SnakeHeadPosition.X, col = SnakeHeadPosition.Y; //new position of snake
 	switch (direction) {
-	case UP: row --; break;
-	case DOWN: row++; break;
-	case LEFT: col--; break;
-	case RIGHT: col++; break;
+	case UP: SnakeHeadPosition.X--; break;
+	case DOWN: SnakeHeadPosition.X++; break;
+	case LEFT:  SnakeHeadPosition.Y--; break;
+	case RIGHT:  SnakeHeadPosition.Y++; break;
 	}
-    SnakeHeadPosition.X = row;
-    SnakeHeadPosition.Y = col;
 
-	//validate x, y
-	if (row == GridHeight - 1 || col == GridWidth - 1 || col == 0 || row == 0) {//collided with walls
+	//validate new position  of snake
+	if (SnakeHeadPosition.X == GridHeight - 1 || SnakeHeadPosition.Y == GridWidth - 1 || SnakeHeadPosition.Y == 0 || SnakeHeadPosition.X == 0) {//collided with walls
 		return 1;
 	}
 
 	//Snake self-collision. 
-    //Note it is impossible for the head of the snake to collide with the last part of its tail because they move at the same time.
-    //It is also impossible for the head of the snake to collide with itself.
-    //Body[0] : tail coordinates
+    //It is impossible for snake head to collide with itself.
     //Body[Body.size()-1] : head coordinates
-	for (int i = 1;i < Body.size() - 1;i++) { 
-        if (Body[i].X == row && Body[i].Y == col) {
+	for (int i = 0;i < Body.size() - 1;i++) { 
+        if (Body[i].X == SnakeHeadPosition.X && Body[i].Y == SnakeHeadPosition.Y) {
             return 1;
         }
 	}
@@ -40,7 +37,7 @@ bool Snake::move_snake(char direction) { //returns 1 if there was a collision
 	//update head and tail of snake
 	Body.push_back(SnakeHeadPosition);
 	if (Body.size() > SnakeLength) { //if body has grown in size
-		Body.erase(Body.begin()); // same effect as moving tail
+		Body.erase(Body.begin()); 
 	}
 	return 0;
 }
@@ -48,7 +45,7 @@ bool Snake::move_snake(char direction) { //returns 1 if there was a collision
 std::vector <COORD> Snake::get_body() { return Body; }
 
 void Snake::grow(){
-	SnakeLength+=5;
+	SnakeLength+=50;
 }
 
 bool Snake ::eaten(COORD foodpos) {
@@ -124,32 +121,58 @@ bool Snake :: NotSnakeBody(int row, int col) {
     return 1;
 }
 
-bool Snake::LastTailPart(int row, int col) {
-    if(SnakeLength == 1)return 0;
-    COORD tail = Body[Body.size() - 1];
-    if (tail.X == row && tail.Y == col)return 1;
-    return 0;
+char Snake::AI_Hamilton() {
+    int currentrow = SnakeHeadPosition.X;
+    int currentcol = SnakeHeadPosition.Y;
+
+    //return snake to start of cycle
+    if (currentrow == 1) {
+        if (currentcol == 1) {
+            return DOWN;
+        }
+        else {
+            return LEFT;
+        }
+    }
+
+    if (currentrow == 2 || currentrow == GridHeight - 2)return RIGHT;
+
+    if (currentcol % 2 == 1) { //move up or right
+        if (currentrow == GridHeight - 2) { //turn 1 unit right
+            return RIGHT;
+        }
+        else { 
+            return DOWN;
+        }
+    }
+    else { //move down or right
+        if (currentrow == 2) { //turn 1 unit right
+            return RIGHT;
+        }
+        else {
+            return UP;
+        }
+    }
 }
-char Snake::AI(COORD FoodPos) {
+char Snake::AI_BFS(COORD FoodPos) {
     int startcol = SnakeHeadPosition.Y;
     int startrow = SnakeHeadPosition.X;
-
+      
     std::vector <int> dx = { 1,0,-1,0 }; // translation horizontally
     std::vector <int> dy = { 0,1,0,-1 }; //translation vertically
 
     char D1 = minPath(FoodPos); //direction required to go towards food in shortest steps
     if(D1!=ERROR)return D1;
-    int x, y;
 
-    //find all possible moves from current position and evaluate them
+    //if there's no current path to food, pick any valid path.
+    int x, y;
     for (int i = 0;i < 4;i++) {
            x = startrow + dx[i]; // new row 
            y = startcol + dy[i]; // new col
             if (x > 0 && x < GridHeight - 1 && y > 0
-                && y < GridWidth - 1 && NotSnakeBody(x, y) && !LastTailPart(x,y)) {
-
+                && y < GridWidth - 1 && NotSnakeBody(x, y)) {
                 if (x == startrow) {
-                    if (y - startcol == 1) { return RIGHT; } //move right
+                    if (y- startcol == 1) { return RIGHT; } //move right
                     return LEFT; //move left
                 }
                 if (y == startcol) {
@@ -157,71 +180,8 @@ char Snake::AI(COORD FoodPos) {
                     return UP;//move up
                 }
             }
-        }
-    return RIGHT;
-
-    return D1;
-}
-
-std::stack <std::pair<int, int>> Snake :: maxPath(COORD FoodPos) {// using brute force
-    int startcol = SnakeHeadPosition.Y;
-    int startrow = SnakeHeadPosition.X;
-    int finishcol = FoodPos.Y;
-    int finishrow = FoodPos.X;
-
-    std::map < std::pair<int, int>, int > distance = { {{startrow, startcol},0} }; //distance from start to stored node(in terms of number of moves required)
-    std::stack <std::pair<int, int>> NextNode; //next node to be checked
-    std::stack <std::pair<int, int>> longestpath; //stores nodes along longest path in (row,col) format
-    std::map <std::pair<int, int>, std::pair<int, int>> parentnode = { {{startrow, startcol}, {-1,-1}} }; // {node, parent node}
-
-    std::vector <int> dx = { 1,0,-1,0 }; // translation horizontally
-    std::vector <int> dy = { 0,1,0,-1 }; //translation vertically
-    int x, y; // new coordinates (row,col) after moving 
-    int currentdistance;
-    int maxdistance = -1;
-
-    NextNode.push({ startrow, startcol });
-
-    while (NextNode.size() != 0) {
-        std::pair<int, int> currentcoord = NextNode.top();
-        currentdistance = distance[currentcoord];
-        NextNode.pop();
-
-        if (currentcoord.first == finishrow && currentcoord.second == finishcol) { //destination reached
-            if (currentdistance > maxdistance) { //new longest path discovered
-                maxdistance = currentdistance;
-                longestpath.empty();
-                int x0, y0;
-                x = currentcoord.first;
-                y = currentcoord.second;
-                while (x != -1) { // while start node not reached, 
-                    longestpath.push({ x, y });
-                    x0 = x; y0 = y;
-                    x = parentnode[{x0, y0}].first;
-                    y = parentnode[{x0, y0}].second;
-                }
-            }
-        }
-        else {
-            for (int i = 0; i < 4;i++) {
-                x = currentcoord.first + dx[i]; //row 
-                y = currentcoord.second + dy[i]; //col
-
-                if (x > 0 && x < GridHeight - 1 && y > 0
-                    && y < GridWidth - 1 && parentnode.count({ x,y }) == 0 //unvisited
-                    && NotSnakeBody(x, y)) {
-                    NextNode.push({ x,y });
-                    if (currentdistance + 1 > distance[{x, y}]) {
-                        distance[{x, y}]=currentdistance+1;
-                    }
-                    parentnode[{x, y}] = { currentcoord.first, currentcoord.second };
-                }
-
-            }
-        }
-
     }
-    //if path does not exist to food ?????
-    return longestpath;
-    
+    //if there's no valid path, die.
+    return DOWN;
 }
+
