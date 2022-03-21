@@ -37,3 +37,5 @@ Getting started : https://youtu.be/AxrQje7V65o
 BFS algorithm : https://cs.stanford.edu/people/abisee/gs.pdf
 
 Different AI snake algorithms : https://medium.com/analytics-vidhya/playing-snake-with-ai-2ea68f0e914a
+
+https://github.com/chuyangliu/Snake/tree/7227f5e0f3185b07e9e3de1ac5c19a17b9de3e3c
