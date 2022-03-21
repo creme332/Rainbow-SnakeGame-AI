@@ -152,18 +152,17 @@ void UpdateBoard() {
 int main() {
     
     srand(time(NULL)); //seed for random function
-    int score = 0;
+    int score = 0; //snake score
     char Direction = RIGHT; //initially move right
     bool HasCollided = 0; //has Snake collided with wall or itself?
     bool AIMode = 1; // AI mode
 
     InitialiseTerminal();
-    hidecursor();
     while (!HasCollided) {
         hidecursor();
 
-        //if (Direction == UP || Direction == DOWN) {std::this_thread::sleep_for(std::chrono::milliseconds(40));}
-        //else {std::this_thread::sleep_for(std::chrono::milliseconds(10));}
+        if (Direction == UP || Direction == DOWN) {std::this_thread::sleep_for(std::chrono::milliseconds(40));}
+        else {std::this_thread::sleep_for(std::chrono::milliseconds(10));}
 
         //move 
         if (AIMode) { 
