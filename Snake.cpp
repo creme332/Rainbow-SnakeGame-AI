@@ -122,36 +122,29 @@ bool Snake :: NotSnakeBody(int row, int col) {
 }
 
 char Snake::AI_Hamilton() {
+    //GridWidth must be even and GridHeight must be odd
     int currentrow = SnakeHeadPosition.X;
     int currentcol = SnakeHeadPosition.Y;
 
     //return snake to start of cycle
     if (currentrow == 1) {
-        if (currentcol == 1) {
-            return DOWN;
-        }
-        else {
-            return LEFT;
-        }
+        if (currentcol == 1) {return DOWN;}
+        else {return LEFT;}
     }
 
-    if (currentrow == 2 || currentrow == GridHeight - 2)return RIGHT;
+    if (currentrow == 2 && currentcol == GridWidth-2)return UP;
 
-    if (currentcol % 2 == 1) { //move up or right
+    if (currentcol % 2 == 1) { //move down or right
         if (currentrow == GridHeight - 2) { //turn 1 unit right
             return RIGHT;
         }
-        else { 
-            return DOWN;
-        }
+        else {return DOWN;}
     }
-    else { //move down or right
+    else { //move up or right
         if (currentrow == 2) { //turn 1 unit right
             return RIGHT;
         }
-        else {
-            return UP;
-        }
+        else {return UP;}
     }
 }
 char Snake::AI_BFS(COORD FoodPos) {

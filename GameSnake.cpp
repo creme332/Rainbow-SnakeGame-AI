@@ -66,7 +66,8 @@ void GenerateFood() {
     FoodPos.Y = (rand() % (WIDTH - 2)) + 1; //col
     FoodPos.X = (rand() % (HEIGHT - 2)) + 1; //row
 
-    while (!mySnake.NotSnakeBody(FoodPos.Y, FoodPos.X)) { //spawn food in a position not occupied by snake
+    //spawn food in a position not occupied by snake
+    while (!mySnake.NotSnakeBody(FoodPos.Y, FoodPos.X)) { 
         FoodPos.Y = (rand() % (WIDTH - 2)) + 1;
         FoodPos.X = (rand() % (HEIGHT - 2)) + 1;
     }
@@ -161,11 +162,15 @@ int main() {
     system("pause");
     while (!HasCollided) {
         hidecursor();
+
         if (Direction == UP || Direction == DOWN) {std::this_thread::sleep_for(std::chrono::milliseconds(40));}
         else {std::this_thread::sleep_for(std::chrono::milliseconds(10));}
 
         //move 
-        if (AIMode) { Direction = mySnake.AI_BFS(FoodPos); }
+        if (AIMode) { 
+             Direction = mySnake.AI_Hamilton();
+             //Direction = mySnake.AI_BFS(FoodPos);
+        }
         else {
             if (_kbhit()) { Direction = _getch(); //HasCollided = mySnake.move_snake(Direction);UpdateBoard();
             }
