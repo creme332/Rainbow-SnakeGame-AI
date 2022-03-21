@@ -17,8 +17,9 @@ private :
 	std::vector <COORD> Body;  //Body.X : row number and Body.Y : col number. Last position in Body is the head
 	int GridWidth; //number of columns in grid
 	int GridHeight; //number of rows in grid.
+	int GrowthRate; //by how many units does snake grow after eating food
 public:
-	Snake(COORD headpos, int width, int height);
+	Snake(COORD headpos, int growth, int width, int height);
 	bool move_snake(char direction);
 	void grow();
 	bool eaten(COORD foodpos);

@@ -1,7 +1,8 @@
 #include "Snake.h"
-Snake::Snake(COORD headpos, int width, int height) {
+Snake::Snake(COORD headpos, int growth, int width, int height) {
 	this->SnakeHeadPosition = headpos;
 	SnakeLength = 1;
+    GrowthRate = growth;
     GridHeight = height;
     GridWidth = width;
 	Body.push_back(headpos);
@@ -45,7 +46,7 @@ bool Snake::move_snake(char direction) { //returns 1 if there was a collision
 std::vector <COORD> Snake::get_body() { return Body; }
 
 void Snake::grow(){
-	SnakeLength+=50;
+	SnakeLength+=GrowthRate;
 }
 
 bool Snake ::eaten(COORD foodpos) {

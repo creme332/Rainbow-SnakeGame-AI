@@ -29,7 +29,7 @@ using namespace std;
 char TerminalGrid[HEIGHT][WIDTH]; //board currently displayed on terminal
 COORD MiddleGridPosition = { HEIGHT / 2, WIDTH / 2 };
 COORD FoodPos; //position of food on board. FoodPos.X : row number. FoodPos.Y=col number
-Snake mySnake(MiddleGridPosition, WIDTH, HEIGHT);
+Snake mySnake(MiddleGridPosition, 5, WIDTH, HEIGHT); // initial position, growth rate, grid width, grid height
 int k = -1; //color counter
 
 string Color(char c) { // color a character
@@ -159,17 +159,16 @@ int main() {
 
     InitialiseTerminal();
     hidecursor();
-    system("pause");
     while (!HasCollided) {
         hidecursor();
 
-        if (Direction == UP || Direction == DOWN) {std::this_thread::sleep_for(std::chrono::milliseconds(40));}
-        else {std::this_thread::sleep_for(std::chrono::milliseconds(10));}
+        //if (Direction == UP || Direction == DOWN) {std::this_thread::sleep_for(std::chrono::milliseconds(40));}
+        //else {std::this_thread::sleep_for(std::chrono::milliseconds(10));}
 
         //move 
         if (AIMode) { 
-             Direction = mySnake.AI_Hamilton();
-             //Direction = mySnake.AI_BFS(FoodPos);
+            // Direction = mySnake.AI_Hamilton();
+             Direction = mySnake.AI_BFS(FoodPos);
         }
         else {
             if (_kbhit()) { Direction = _getch(); //HasCollided = mySnake.move_snake(Direction);UpdateBoard();
