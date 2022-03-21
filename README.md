@@ -29,6 +29,7 @@ If game is over, close all previous terminals before starting a new one.
 - [x] Output score at the end in the center of grid
 - [x] Implement Hamilton algorithm (use an approximation of the longest path from snake head to food)
 - [ ] Implement a combination of Hamilton and BFS to improve Hamilton
+- [ ] Improve food generation algorithm (keep track of unoccupied grid cells)
 - [ ] 
 # Resources used to build the game #
 Getting started : https://youtu.be/AxrQje7V65o 
