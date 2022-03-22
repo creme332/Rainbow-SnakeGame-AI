@@ -6,7 +6,7 @@
 
 
 # Features #
-1. Smooth gameplay (No flickering of screen/cursor which is a common problem when refreshing the terminal without a graphics library).
+1. Uses [double buffering technique](https://en.wikipedia.org/wiki/Multiple_buffering) to create a smooth gameplay. (No flickering of screen/cursor which is a common problem when refreshing the terminal without a graphics library).
 2. Colored terminal.
 3. AI mode (work in progress)
 
