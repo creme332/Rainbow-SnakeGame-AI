@@ -10,6 +10,14 @@
 2. Colored terminal.
 3. AI mode (work in progress)
 
+# Installing #
+Header files  
+  - Snake.h
+
+Source files
+  - Snake.cpp
+  - GameSnake.cpp
+
 # How to play #
 Use W-A-S-D keys to move snake while avoiding walls and collecting food. (Caps lock of keyboard should be OFF)
 
