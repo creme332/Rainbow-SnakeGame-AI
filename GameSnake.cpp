@@ -2,13 +2,14 @@
 #include <cstring>
 #include <conio.h> 
 #include <string>
-#include "Snake.h"
 #include <Windows.h>
 #include <thread>
 #include <algorithm>
 #include <cstdlib>
 #include <map>
 #include <deque>
+
+#include "..\include\Snake.h"
 
 #define NOMINMAX
 #define WIN32_LEAN_AND_MEAN

@@ -1,4 +1,4 @@
-#include "Snake.h"
+#include "../include/Snake.h"
 Snake::Snake(COORD headpos, int growth, int width, int height) {
 	this->SnakeHeadPosition = headpos;
 	SnakeLength = 1;
