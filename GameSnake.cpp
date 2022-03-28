@@ -9,7 +9,7 @@
 #include <map>
 #include <deque>
 
-#include "..\include\Snake.h"
+#include "Snake.h"
 
 #define NOMINMAX
 #define WIN32_LEAN_AND_MEAN
@@ -162,17 +162,17 @@ int main() {
     while (!HasCollided) {
         hidecursor();
 
-        if (Direction == UP || Direction == DOWN) {std::this_thread::sleep_for(std::chrono::milliseconds(40));}
-        else {std::this_thread::sleep_for(std::chrono::milliseconds(10));}
-
         //move 
         if (AIMode) { 
-            // Direction = mySnake.AI_Hamilton();
-             Direction = mySnake.AI_BFS(FoodPos);
+             //Direction = mySnake.AI_Hamilton();
+            Direction = mySnake.AI_Hamilton_BFS(FoodPos,20);
         }
-        else {
+        else {//1-player mode
+
             if (_kbhit()) { Direction = _getch(); //HasCollided = mySnake.move_snake(Direction);UpdateBoard();
             }
+             if (Direction == UP || Direction == DOWN) {std::this_thread::sleep_for(std::chrono::milliseconds(40));}
+             else {std::this_thread::sleep_for(std::chrono::milliseconds(10));}
         }
        HasCollided = mySnake.move_snake(Direction);
        UpdateBoard();

@@ -1,4 +1,4 @@
-#include "../include/Snake.h"
+#include "Snake.h"
 Snake::Snake(COORD headpos, int growth, int width, int height) {
 	this->SnakeHeadPosition = headpos;
 	SnakeLength = 1;
@@ -10,7 +10,7 @@ Snake::Snake(COORD headpos, int growth, int width, int height) {
 
 bool Snake::move_snake(char direction) { //returns 1 if there was a collision
 
-    if (direction == ERROR) return 1; //invalid direction
+    if (direction == INVALID) return 1; //invalid direction
 	if (SnakeLength >= (GridWidth -1) * (GridHeight -1))return 1; //game over if snake occupies entire board
 
 	switch (direction) {
@@ -28,7 +28,7 @@ bool Snake::move_snake(char direction) { //returns 1 if there was a collision
 	//Snake self-collision. 
     //It is impossible for snake head to collide with itself.
     //Body[Body.size()-1] : head coordinates
-	for (int i = 0;i < Body.size() - 1;i++) { 
+	for (size_t i = 0;i < Body.size() - 1;i++) { 
         if (Body[i].X == SnakeHeadPosition.X && Body[i].Y == SnakeHeadPosition.Y) {
             return 1;
         }
@@ -56,7 +56,7 @@ bool Snake ::eaten(COORD foodpos) {
 
 COORD Snake::get_pos() {return SnakeHeadPosition;}
 
-char Snake::minPath(COORD Destination) {
+char Snake::BFS(COORD Destination) {//finds direction leading to shortest path from snake head to destination
     int startcol = SnakeHeadPosition.Y;
     int startrow = SnakeHeadPosition.X;
     int finishcol = Destination.Y;
@@ -71,6 +71,7 @@ char Snake::minPath(COORD Destination) {
     std::vector <int> dy = { 0,1,0,-1 }; //translation vertically
     int x, y; // new coordinates (row,col) after moving 
 
+    char direction = INVALID;
     while (NextNode.size() != 0) {
         std:: pair<int, int> currentcoord = NextNode.front();
         NextNode.pop_front();
@@ -98,12 +99,12 @@ char Snake::minPath(COORD Destination) {
                     //0 th node of shortestpath is startnode and 1st node is our next node to be visited
                     int nextrow = shortestpath[1].first, nextcol = shortestpath[1].second;
                     if (nextrow == startrow) {
-                        if (nextcol - startcol == 1) { return RIGHT; } //move right
-                        return LEFT; //move left
+                        if (nextcol - startcol == 1) { direction = RIGHT; break; } //move right
+                        direction = LEFT; break; //move left
                     }
                     if (nextcol == startcol) {
-                        if (nextrow - startrow == 1) { return DOWN; }//move down
-                        return UP;//move up
+                        if (nextrow - startrow == 1) { direction = DOWN; break; }//move down
+                        direction = UP; break; //move up
                     }
                 }
 
@@ -111,12 +112,40 @@ char Snake::minPath(COORD Destination) {
 
         }
     }
-    return ERROR; //if path does not exist to Destination
+    return direction;
+}
+
+char Snake::FreeDirection() {
+    //used to find a free position for snake when stuck.
+    int startcol = SnakeHeadPosition.Y;
+    int startrow = SnakeHeadPosition.X;
+
+    std::vector <int> dx = { 1,0,-1,0 }; // translation horizontally
+    std::vector <int> dy = { 0,1,0,-1 }; //translation vertically
+
+    int x, y;
+    for (int i = 0;i < 4;i++) {
+        x = startrow + dx[i]; // new row 
+        y = startcol + dy[i]; // new col
+        if (x > 0 && x < GridHeight - 1 && y > 0
+            && y < GridWidth - 1 && NotSnakeBody(x, y)) {
+            if (x == startrow) {
+                if (y - startcol == 1) { return RIGHT; } //move right
+                return LEFT; //move left
+            }
+            if (y == startcol) {
+                if (x - startrow == 1) { return DOWN; }//move down
+                return UP;//move up
+            }
+        }
+    }
+    //there's no free position path.
+    return INVALID;
 }
 
 bool Snake :: NotSnakeBody(int row, int col) {
     // Is cell at (row, col) not a snake body part ?
-    for (int i = 0;i < Body.size();i++) {
+    for (size_t i = 0;i < Body.size();i++) {
         if (Body[i].Y == col && Body[i].X == row)return 0;
     }
     return 1;
@@ -148,34 +177,30 @@ char Snake::AI_Hamilton() {
         else {return UP;}
     }
 }
-char Snake::AI_BFS(COORD FoodPos) {
-    int startcol = SnakeHeadPosition.Y;
-    int startrow = SnakeHeadPosition.X;
-      
-    std::vector <int> dx = { 1,0,-1,0 }; // translation horizontally
-    std::vector <int> dy = { 0,1,0,-1 }; //translation vertically
 
-    char D1 = minPath(FoodPos); //direction required to go towards food in shortest steps
-    if(D1!=ERROR)return D1;
+int Snake::PythagorasDistance(COORD Destination) {
+    int x = SnakeHeadPosition.X;
+    int y = SnakeHeadPosition.Y;
+    int row = Destination.X;
+    int col = Destination.Y;
+    return sqrt((x - row) * (x - row) + (y - col) * (y - col));
+}
+char Snake::AI_Hamilton_BFS(COORD FoodPos, int Aggressiveness) {
+    char d1 = BFS(FoodPos);
+    char d2 =  AI_Hamilton();
 
-    //if there's no current path to food, pick any valid path.
-    int x, y;
-    for (int i = 0;i < 4;i++) {
-           x = startrow + dx[i]; // new row 
-           y = startcol + dy[i]; // new col
-            if (x > 0 && x < GridHeight - 1 && y > 0
-                && y < GridWidth - 1 && NotSnakeBody(x, y)) {
-                if (x == startrow) {
-                    if (y- startcol == 1) { return RIGHT; } //move right
-                    return LEFT; //move left
-                }
-                if (y == startcol) {
-                    if (x - startrow == 1) { return DOWN; }//move down
-                    return UP;//move up
-                }
-            }
+    //Use shortest path when snake is small
+    if (SnakeLength < GridHeight)return d1;
+
+    //Case 1 : Food is to the right of snake head and shortest path to food is a straight line
+    if (SnakeHeadPosition.X == FoodPos.X && FoodPos.Y > SnakeHeadPosition.Y && FoodPos.Y - SnakeHeadPosition.Y < Aggressiveness) {
+        if (d1 != INVALID)return d1;
     }
-    //if there's no valid path, die.
-    return DOWN;
+    //Case 2 : Food is to the left of snake head  -> return to start position
+    if (FoodPos.Y < SnakeHeadPosition.Y) {
+        if (SnakeHeadPosition.X == 2 && NotSnakeBody(1,SnakeHeadPosition.Y))return UP;
+    }
+    char free = FreeDirection();
+    return d2; //Does D2 lead to snake death?
 }
 
