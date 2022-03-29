@@ -13,8 +13,8 @@
 
 #define NOMINMAX
 #define WIN32_LEAN_AND_MEAN
-#define HEIGHT 25
-#define WIDTH 50
+#define HEIGHT 15 //default height = 25
+#define WIDTH 30 //default width = 50 
 #define VERTICAL_WALL '|'
 #define HORIZONTAL_WALL '#'
 #define EMPTY ' '

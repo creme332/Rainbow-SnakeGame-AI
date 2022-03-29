@@ -6,6 +6,10 @@ Snake::Snake(COORD headpos, int growth, int width, int height) {
     GridHeight = height;
     GridWidth = width;
 	Body.push_back(headpos);
+    GridSnake[0] = headpos.X;
+    GridSnake[1] = headpos.X;
+    GridSnake[2] = headpos.Y;
+    GridSnake[3] = headpos.Y;
 }
 
 bool Snake::move_snake(char direction) { //returns 1 if there was a collision
@@ -35,12 +39,31 @@ bool Snake::move_snake(char direction) { //returns 1 if there was a collision
 	}
 
     //at this point, new position is valid.
+    
+    //update the smallest grid bounding whole snake
+    GridSnake[0] = min(SnakeHeadPosition.X, GridSnake[0]); //min row
+    GridSnake[1] = max(SnakeHeadPosition.X, GridSnake[1]); //max row
+
+    GridSnake[2] = min(SnakeHeadPosition.Y, GridSnake[2]); //min col
+    GridSnake[3] = max(SnakeHeadPosition.Y, GridSnake[3]); //max col
+
 	//update head and tail of snake
 	Body.push_back(SnakeHeadPosition);
-	if (Body.size() > SnakeLength) { //if body has grown in size
-		Body.erase(Body.begin()); 
-	}
-	return 0;
+	if (Body.size() > SnakeLength) { 
+        if (GridSnake[0] == Body[0].X) GridSnake[0] = Body[1].X;
+        if (GridSnake[1] == Body[0].X) GridSnake[1] = Body[1].X;
+        if (GridSnake[2] == Body[0].Y) GridSnake[2] = Body[1].Y;
+        if (GridSnake[3] == Body[0].Y) GridSnake[3] = Body[1].Y;
+
+
+		Body.erase(Body.begin()); //if snake has not eaten anything, simply remove its tail
+
+	}//else body has grown in size, do not move tail => illusion that snake is growing
+
+
+
+
+	return 0; //there are no collisions
 }
 
 std::vector <COORD> Snake::get_body() { return Body; }
@@ -112,11 +135,11 @@ char Snake::BFS(COORD Destination) {//finds direction leading to shortest path f
 
         }
     }
-    return direction;
+    return direction; //returns INVALID if no shortest path exist
 }
 
 char Snake::FreeDirection() {
-    //used to find a free position for snake when stuck.
+    //returns direction that leads to closest free position.
     int startcol = SnakeHeadPosition.Y;
     int startrow = SnakeHeadPosition.X;
 
@@ -139,7 +162,7 @@ char Snake::FreeDirection() {
             }
         }
     }
-    //there's no free position path.
+    //there's no free position.
     return INVALID;
 }
 
@@ -178,13 +201,6 @@ char Snake::AI_Hamilton() {
     }
 }
 
-int Snake::PythagorasDistance(COORD Destination) {
-    int x = SnakeHeadPosition.X;
-    int y = SnakeHeadPosition.Y;
-    int row = Destination.X;
-    int col = Destination.Y;
-    return sqrt((x - row) * (x - row) + (y - col) * (y - col));
-}
 char Snake::AI_Hamilton_BFS(COORD FoodPos, int Aggressiveness) {
     char d1 = BFS(FoodPos);
     char d2 =  AI_Hamilton();
@@ -192,15 +208,26 @@ char Snake::AI_Hamilton_BFS(COORD FoodPos, int Aggressiveness) {
     //Use shortest path when snake is small
     if (SnakeLength < GridHeight)return d1;
 
-    //Case 1 : Food is to the right of snake head and shortest path to food is a straight line
-    if (SnakeHeadPosition.X == FoodPos.X && FoodPos.Y > SnakeHeadPosition.Y && FoodPos.Y - SnakeHeadPosition.Y < Aggressiveness) {
+    //Case 1 : Food is to the right of snake head and shortest path to food is a horizontal line
+    if (SnakeHeadPosition.X == FoodPos.X && GridSnake[3] <= FoodPos.Y) {
         if (d1 != INVALID)return d1;
     }
     //Case 2 : Food is to the left of snake head  -> return to start position
     if (FoodPos.Y < SnakeHeadPosition.Y) {
         if (SnakeHeadPosition.X == 2 && NotSnakeBody(1,SnakeHeadPosition.Y))return UP;
     }
+
+    bool alive = 0; // will snake be alive after moving in direction d2
+    switch (d2) {
+        case UP: alive = NotSnakeBody(SnakeHeadPosition.X - 1, SnakeHeadPosition.Y); break;
+        case DOWN: alive = NotSnakeBody(SnakeHeadPosition.X + 1, SnakeHeadPosition.Y); break;
+        case LEFT: alive = NotSnakeBody(SnakeHeadPosition.X, SnakeHeadPosition.Y - 1); break;
+        case RIGHT: alive = NotSnakeBody(SnakeHeadPosition.X, SnakeHeadPosition.Y + 1); break;
+    }
+    if (alive)return d2;
     char free = FreeDirection();
-    return d2; //Does D2 lead to snake death?
+    if (free != INVALID)return free;
+
+    return DOWN; //snake cannot do anything and will get killed 
 }
 

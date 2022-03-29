@@ -19,7 +19,7 @@ private :
 	int GridHeight; //number of rows in grid.
 	int GrowthRate; //by how many units does snake grow after eating food
 	char FreeDirection();
-	int PythagorasDistance(COORD Destination); //pythagoras distance from snake head to another point
+	int GridSnake[4]; // {minrow, maxrow, mincol, maxcol} defines the minimum grid that contains whole snake
 
 public:
 	Snake(COORD headpos, int growth, int width, int height);
