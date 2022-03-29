@@ -4,6 +4,8 @@
 ![](Media/HamiltonGif.gif)
 <sub><sup>Based on Hamiltonian cycle</sup></sub>
 
+![](Media/LatestAI.gif)
+<sub><sup>Based on Hamiltonian cycle and BFS</sup></sub>
 
 # Features #
 1. Uses [double buffering technique](https://en.wikipedia.org/wiki/Multiple_buffering) to create a smooth gameplay. (No flickering of screen/cursor which is a common problem when refreshing the terminal without a graphics library).
