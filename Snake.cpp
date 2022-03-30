@@ -61,8 +61,6 @@ bool Snake::move_snake(char direction) { //returns 1 if there was a collision
 	}//else body has grown in size, do not move tail => illusion that snake is growing
 
 
-
-
 	return 0; //there are no collisions
 }
 
@@ -77,7 +75,7 @@ bool Snake ::eaten(COORD foodpos) {
 	return 0;
 }
 
-COORD Snake::get_pos() {return SnakeHeadPosition;}
+COORD Snake::get_SnakeHeadPosition() {return SnakeHeadPosition;}
 
 char Snake::BFS(COORD Destination) {//finds direction leading to shortest path from snake head to destination
     int startcol = SnakeHeadPosition.Y;

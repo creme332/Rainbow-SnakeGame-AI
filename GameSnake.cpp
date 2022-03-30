@@ -13,8 +13,8 @@
 
 #define NOMINMAX
 #define WIN32_LEAN_AND_MEAN
-#define HEIGHT 15 //default height = 25
-#define WIDTH 30 //default width = 50 
+#define HEIGHT 25 //default height = 25. HEIGHT must be an odd number
+#define WIDTH 50 //default width = 50. WIDTH must be an even number
 #define VERTICAL_WALL '|'
 #define HORIZONTAL_WALL '#'
 #define EMPTY ' '
@@ -25,7 +25,6 @@
 #define RIGHT 'd'
 #define UP 'w'
 #define DOWN 's'
-using namespace std;
 
 char TerminalGrid[HEIGHT][WIDTH]; //board currently displayed on terminal
 COORD MiddleGridPosition = { HEIGHT / 2, WIDTH / 2 };
@@ -33,17 +32,17 @@ COORD FoodPos; //position of food on board. FoodPos.X : row number. FoodPos.Y=co
 Snake mySnake(MiddleGridPosition, 5, WIDTH, HEIGHT); // initial position, growth rate, grid width, grid height
 int k = -1; //color counter
 
-string Color(char c) { // color a character
+std::string Color(char c) { // color a character
     int color[] = { 196,220,226,10,39,129 }; //list of colors
     if (c == SNAKEHEAD) return  "\033[48;5;196m\033[38;5;232m \033[0m"; //green block for head
     if (c == SNAKEBODY) {
         // int k = rand() % (sizeof(color) / sizeof(color[0])); //pick a random color for snake body
         k = (k + 1) % (sizeof(color) / sizeof(color[0]));
-        return  "\033[48;5;" + to_string(color[k]) + "m\033[38;5;232m \033[0m";
+        return  "\033[48;5;" + std::to_string(color[k]) + "m\033[38;5;232m \033[0m";
     }
     if (c == HORIZONTAL_WALL || c == VERTICAL_WALL)return  "\033[48;5;15m\033[38;5;232m \033[0m";
     if (c == FOOD) return  "\033[48;5;14m\033[38;5;232m \033[0m"; //red block for food
-    string output = ""; output += c;
+    std::string output = ""; output += c;
     return output;
 }
 void hidecursor()
@@ -76,9 +75,9 @@ void GenerateFood() {
 }
 
 void InitialiseTerminal() {
-
+    system("cls");
     GenerateFood();
-    COORD SnakeHeadPosition = mySnake.get_pos();
+    COORD SnakeHeadPosition = mySnake.get_SnakeHeadPosition();
     //first initialise TerminalGrid 
     for (int row = 0;row < HEIGHT;row++) { //ADD snake head here!!!!
         TerminalGrid[row][0] = VERTICAL_WALL;
@@ -98,15 +97,15 @@ void InitialiseTerminal() {
     //output to terminal
     for (int row = 0;row < HEIGHT;row++) {
         for (int col = 0;col < WIDTH;col++) {
-            cout << Color(TerminalGrid[row][col]);
+            std::cout << Color(TerminalGrid[row][col]);
         }
-        cout << "\n";
+        std::cout << "\n";
     }
 }
 
 void UpdateBoard() {
-    COORD SnakeHeadPosition = mySnake.get_pos();
-    vector <COORD> snakebody = mySnake.get_body();
+    COORD SnakeHeadPosition = mySnake.get_SnakeHeadPosition();
+    std::vector <COORD> snakebody = mySnake.get_body();
     setCursorPosition(HEIGHT, 0);
     //create a new board
     char newBoard[HEIGHT][WIDTH];
@@ -157,41 +156,42 @@ int main() {
     char Direction = RIGHT; //initially move right
     bool HasCollided = 0; //has Snake collided with wall or itself?
     bool AIMode = 1; // AI mode
+    bool RestartGame = 1;
+        std::cout << "Single player mode (0) or AI mode (1)?";
+        std::cin >> AIMode;
+        InitialiseTerminal();
 
-    InitialiseTerminal();
-    while (!HasCollided) {
-        hidecursor();
+        while (!HasCollided) {
+            hidecursor();
 
-        //move 
-        if (AIMode) { 
-             //Direction = mySnake.AI_Hamilton();
-            Direction = mySnake.AI_Hamilton_BFS(FoodPos,20);
-        }
-        else {//1-player mode
-
-            if (_kbhit()) { Direction = _getch(); //HasCollided = mySnake.move_snake(Direction);UpdateBoard();
+            //move 
+            if (AIMode) {
+                Direction = mySnake.AI_Hamilton_BFS(FoodPos, 20);
             }
-             if (Direction == UP || Direction == DOWN) {std::this_thread::sleep_for(std::chrono::milliseconds(40));}
-             else {std::this_thread::sleep_for(std::chrono::milliseconds(10));}
-        }
-       HasCollided = mySnake.move_snake(Direction);
-       UpdateBoard();
-        if (mySnake.eaten(FoodPos)) {
-            GenerateFood();
-            score += 10;
-            mySnake.grow();
-        }
-    }
-    setCursorPosition(1, (WIDTH - 2) / 2 - 4);
-    cout << "GAME OVER !";
-    setCursorPosition(2, (WIDTH - 2) / 2 - 4);
-    cout << "SCORE : ";
-    setCursorPosition(2, (WIDTH - 2) / 2 + 4);
-    cout << score;
-    setCursorPosition(HEIGHT + 1, 0);
+            else {//1-player mode
 
-    system("pause");
-    system("pause");
+                if (_kbhit()) {
+                    Direction = _getch(); //HasCollided = mySnake.move_snake(Direction);UpdateBoard();
+                }
+                if (Direction == UP || Direction == DOWN) { std::this_thread::sleep_for(std::chrono::milliseconds(40)); }
+                else { std::this_thread::sleep_for(std::chrono::milliseconds(10)); }
+            }
+            HasCollided = mySnake.move_snake(Direction);
+            UpdateBoard();
+            if (mySnake.eaten(FoodPos)) {
+                GenerateFood();
+                score += 10;
+                mySnake.grow();
+            }
+        }
+        setCursorPosition(1, (WIDTH - 2) / 2 - 4);
+        std::cout << "GAME OVER !";
+        setCursorPosition(2, (WIDTH - 2) / 2 - 4);
+        std::cout << "SCORE : ";
+        setCursorPosition(2, (WIDTH - 2) / 2 + 4);
+        std::cout << score;   
+        setCursorPosition(HEIGHT+1,0);
+        system("pause");
     return 0;
 
 }

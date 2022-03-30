@@ -18,19 +18,19 @@ private :
 	int GridWidth; //number of columns in grid
 	int GridHeight; //number of rows in grid.
 	int GrowthRate; //by how many units does snake grow after eating food
-	char FreeDirection();
+	char FreeDirection(); //returns closest free position
 	int GridSnake[4]; // {minrow, maxrow, mincol, maxcol} defines the minimum grid that contains whole snake
+	char AI_Hamilton(); //returns direction to make snake follow a fixed pattern - hamiltonian cycle
+	char BFS(COORD FoodPos); //returns direction to make snake follow shortest path
 
 public:
 	Snake(COORD headpos, int growth, int width, int height);
 	bool move_snake(char direction);
 	void grow();
 	bool eaten(COORD foodpos);
-	COORD get_pos();
+	COORD get_SnakeHeadPosition(); //returns position of head of snake 
 	std::vector <COORD> get_body();
-	char BFS(COORD FoodPos);
 	bool NotSnakeBody(int row, int col); //is board[row][col] a snake body part?
-	char AI_Hamilton();
 	char AI_Hamilton_BFS(COORD FoodPos, int aggressiveness);
 };
 
