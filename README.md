@@ -4,11 +4,14 @@
 ![](Media/HamiltonGif.gif)
 <sub><sup>Based on Hamiltonian cycle</sup></sub>
 
+![](Media/LatestAI.gif)
+<sub><sup>Based on Hamiltonian cycle and BFS</sup></sub>
 
 # Features #
 1. Uses [double buffering technique](https://en.wikipedia.org/wiki/Multiple_buffering) to create a smooth gameplay. (No flickering of screen/cursor which is a common problem when refreshing the terminal without a graphics library).
 2. Colored terminal.
-3. AI mode (work in progress)
+3. Single player mode 
+4. AI mode - Watch the snake AI play
 
 # Installing #
 Header files  
@@ -18,7 +21,9 @@ Source files
   - Snake.cpp
   - GameSnake.cpp
 
-# How to play #
+Put header files and source files in the same directory.
+
+# How to play (Single player mode) #
 Use W-A-S-D keys to move snake while avoiding walls and collecting food. (Caps lock of keyboard should be OFF)
 
 The snake grows 5 units each time it eats a food.
@@ -36,9 +41,9 @@ If game is over, close all previous terminals before starting a new one.
 - [x] End game when size of snake ==  total cells in grid
 - [x] Output score at the end in the center of grid
 - [x] Implement Hamilton algorithm (use an approximation of the longest path from snake head to food)
-- [ ] Implement a combination of Hamilton and BFS to improve Hamilton
+- [x] Implement a combination of Hamilton and BFS to improve Hamilton
 - [ ] Improve food generation algorithm (keep track of unoccupied grid cells)
-- [ ] 
+
 # Resources used to build the game #
 Getting started : https://youtu.be/AxrQje7V65o 
 
