@@ -14,6 +14,8 @@
 4. AI mode - Watch the snake AI play
 
 # Installing #
+> ⚠️ Game will work NOT work on online compilers and on Mac OS.
+
 Header files  
   - Snake.h
 
@@ -21,7 +23,7 @@ Source files
   - Snake.cpp
   - GameSnake.cpp
 
-Put header files and source files in the same directory.
+Put header files and source files in the same directory then compile.
 
 # How to play (Single player mode) #
 Use W-A-S-D keys to move snake while avoiding walls and collecting food. (Caps lock of keyboard should be OFF)
