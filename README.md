@@ -1,3 +1,4 @@
+# 🐍 Snake game AI
 ![](Media/UpdatedSnakeGif.gif)
 <sub><sup>Based on BFS algorithm</sup></sub>
 
