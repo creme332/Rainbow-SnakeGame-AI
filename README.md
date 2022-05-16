@@ -47,7 +47,7 @@ If game is over, close all previous terminals before starting a new one.
 - [x] Implement a combination of Hamilton and BFS to improve Hamilton
 - [ ] Improve food generation algorithm (keep track of unoccupied grid cells)
 
-# Resources used to build the game #
+# ⛑️ Resources used to build the game #
 Getting started : https://youtu.be/AxrQje7V65o 
 
 BFS algorithm : https://cs.stanford.edu/people/abisee/gs.pdf
