@@ -14,9 +14,12 @@
 3. Single player mode 
 4. AI mode - Watch the snake AI play
 
-# 🚀Installing #
-> ⚠️ Game will work NOT work on online compilers and on Mac OS.
+# 🚀Setup #
+> ⚠️ Game will work NOT work on online compilers and on Mac OS because of windows-specific libraries used.
 
+- Fork project
+- Compile `GameSnake.cpp` with a compiler of your choice.
+## File dependencies ##
 Header files  
   - Snake.h
 
@@ -24,14 +27,16 @@ Source files
   - Snake.cpp
   - GameSnake.cpp
 
-Put header files and source files in the same directory then compile.
+The header files and source files should be in the same directory.
 
-# 📰How to play (Single player mode) #
-Use W-A-S-D keys to move snake while avoiding walls and collecting food. (Caps lock of keyboard should be OFF)
+# 📰How to play #
+In AI mode, you can only watch the AI snake move. 
 
-The snake grows 5 units each time it eats a food.
+In single player mode, use W-A-S-D keys to move snake while avoiding walls and collecting food. 
 
-If game is over, close all previous terminals before starting a new one.
+> ⚠️ Caps lock of keyboard should be OFF.
+
+> ⚠️ If game is over, close current terminal before creating a new one.
 
 # 🛑Limitations # 
 - Snake appears thinner when moving vertically. This is because in the terminal there is small separation between 2 horizontal lines right on top on each other. Unfortunately, nothing can be done to get rid of this line height. 
@@ -47,11 +52,11 @@ If game is over, close all previous terminals before starting a new one.
 - [x] Implement a combination of Hamilton and BFS to improve Hamilton
 - [ ] Improve food generation algorithm (keep track of unoccupied grid cells)
 
-# ⛑️ Resources used to build the game #
-Getting started : https://youtu.be/AxrQje7V65o 
+# ⛑️ Resources used #
+- Getting started : https://youtu.be/AxrQje7V65o 
 
-BFS algorithm : https://cs.stanford.edu/people/abisee/gs.pdf
+- BFS algorithm : https://cs.stanford.edu/people/abisee/gs.pdf
 
-Different AI snake algorithms : https://medium.com/analytics-vidhya/playing-snake-with-ai-2ea68f0e914a
+- Different AI snake algorithms : https://medium.com/analytics-vidhya/playing-snake-with-ai-2ea68f0e914a
 
-https://github.com/chuyangliu/Snake/tree/7227f5e0f3185b07e9e3de1ac5c19a17b9de3e3c
+- https://github.com/chuyangliu/Snake/tree/7227f5e0f3185b07e9e3de1ac5c19a17b9de3e3c
